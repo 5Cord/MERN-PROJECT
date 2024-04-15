@@ -1,5 +1,29 @@
 import PostModal from '../models/post.js'
 
+export const getLastTags = async (req, res) => {
+    try {
+
+        const posts = await PostModal
+            .find()
+            .limit(5)
+            .exec();
+
+        const tags = posts
+            .map((obj) => obj.tags)
+            .flat()
+            .slice(0, 5);
+
+
+        res.json(tags);
+    }
+    catch (err) {
+
+        console.log(err);
+        res.status(500).json({ meassage: 'Не удалось  получить тэги' })
+
+    }
+}
+
 
 export const getAll = async (req, res) => {
 
@@ -23,7 +47,7 @@ export const getOne = async (req, res) => {
             { _id: postId },
             { $inc: { viewsCount: 1 } },
             { returnDocument: 'after' }
-        );
+        ).populate('user');
 
         if (!doc) {
             return res.status(404).json({ message: 'Статья не найдена' });
@@ -35,6 +59,7 @@ export const getOne = async (req, res) => {
         res.status(500).json({ message: 'Не удалось получить статью' });
     }
 }
+
 export const remove = async (req, res) => {
     try {
         const postId = req.params.id;
@@ -54,7 +79,7 @@ export const create = async (req, res) => {
     try {
         const doc = new PostModal({
             title: req.body.title,
-            text: req.body.title,
+            text: req.body.text,
             imageUrl: req.body.imageUrl,
             tags: req.body.tags,
             user: req.userId,
@@ -78,7 +103,7 @@ export const update = async (req, res) => {
             { _id: postId },
             {
                 title: req.body.title,
-                text: req.body.text, // Исправлено с req.body.title на req.body.text
+                text: req.body.text,
                 imageUrl: req.body.imageUrl,
                 user: req.userId,
                 tags: req.body.tags,

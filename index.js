@@ -29,19 +29,20 @@ app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
 app.get('/', (req, res) => {
-    res.send('Hello world');
+
 })
 
-app.post('/login', loginValidation, handleValidationErrors, UserController.login)
-app.post('/register', registerValidation, handleValidationErrors, UserController.register)
-app.get('/me', checkAuth, UserController.getMe);
+app.post('/auth/login', loginValidation, handleValidationErrors, UserController.login)
+app.post('/auth/register', registerValidation, handleValidationErrors, UserController.register)
+app.get('/auth/me', checkAuth, UserController.getMe);
 
 app.post('/upload', checkAuth, upload.single('image'), (req, res) => {
     res.json({
         url: `/uploads/${req.file.originalname}`,
     })
 })
-
+app.get('/tags', PostController.getLastTags);
+app.get('/posts/tags', PostController.getLastTags);
 app.post('/posts', checkAuth, postCreateValidation, handleValidationErrors, PostController.create);
 app.get('/posts', PostController.getAll);
 app.get('/posts/:id', PostController.getOne);
