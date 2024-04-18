@@ -1,5 +1,24 @@
 import PostModal from '../models/post.js'
 
+export const getTagByName = async (req, res) => {
+    const tagName = req.params.nameTag; // Получаем имя тега из запроса
+
+    try {
+        // Ищем посты с тегом, совпадающим с именем
+        const postsWithTag = await PostModal.find({ tags: tagName });
+
+        // Если найдены посты, отправляем только их теги
+        if (postsWithTag.length > 0) {
+            const tags = postsWithTag.map(post => post.tags).flat();
+            res.json(tags);
+        } else {
+            res.status(404).json({ message: 'Тег не найден' });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Не удалось получить тэги' });
+    }
+}
 export const getLastTags = async (req, res) => {
     try {
 
@@ -23,8 +42,6 @@ export const getLastTags = async (req, res) => {
 
     }
 }
-
-
 export const getAll = async (req, res) => {
 
     try {
@@ -59,7 +76,6 @@ export const getOne = async (req, res) => {
         res.status(500).json({ message: 'Не удалось получить статью' });
     }
 }
-
 export const remove = async (req, res) => {
     try {
         const postId = req.params.id;
